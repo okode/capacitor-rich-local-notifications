@@ -1,0 +1,1 @@
+# capacitor-rich-local-notifications
