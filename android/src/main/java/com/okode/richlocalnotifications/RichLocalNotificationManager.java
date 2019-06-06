@@ -21,11 +21,9 @@ public class RichLocalNotificationManager {
 
     private static final String DEFAULT_PRESS_ACTION = "tap";
 
-    private Activity activity;
     private Context context;
 
     public RichLocalNotificationManager(Activity activity) {
-        this.activity = activity;
         this.context = activity;
         createNotificationChannel();
     }
@@ -48,14 +46,15 @@ public class RichLocalNotificationManager {
             return null;
         }
         dismissVisibleNotification(id);
-        buildNotification(notificationManager, richLocalNotification, call);
+        Notification builtNotification = buildNotification(context, richLocalNotification);
+        notificationManager.notify(richLocalNotification.getId(), builtNotification);
         return richLocalNotification.getId();
     }
 
-    protected void buildNotification(NotificationManagerCompat notificationManager, RichLocalNotification richLocalNotification, PluginCall call) {
+    public static Notification buildNotification(Context context, RichLocalNotification richLocalNotification) {
         String channelId = richLocalNotification.getChannelId() != null ?
                 richLocalNotification.getChannelId() : DEFAULT_NOTIFICATION_CHANNEL_ID;
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this.context, channelId)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
                 .setContentTitle(richLocalNotification.getTitle())
                 .setContentText(richLocalNotification.getBody())
                 .setAutoCancel(true)
@@ -65,7 +64,7 @@ public class RichLocalNotificationManager {
         if (richLocalNotification.getPriority() != null) {
             mBuilder.setPriority(richLocalNotification.getPriority());
         } else {
-            mBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
         }
 
         String sound = richLocalNotification.getSound();
@@ -82,26 +81,25 @@ public class RichLocalNotificationManager {
         mBuilder.setOnlyAlertOnce(true);
 
         mBuilder.setSmallIcon(richLocalNotification.getSmallIcon(context));
-        createActionIntents(richLocalNotification, mBuilder);
+        createActionIntents(context, richLocalNotification, mBuilder);
         // notificationId is a unique int for each localNotification that you must define
-        Notification buildNotification = mBuilder.build();
-        notificationManager.notify(richLocalNotification.getId(), buildNotification);
+        return mBuilder.build();
     }
 
-    protected String getOpenAction() {
+    protected static String getOpenAction() {
         return DEFAULT_PRESS_ACTION;
     }
 
     // Create intent for open action
-    protected void createActionIntents(RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
+    protected static void createActionIntents(Context context, RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
         // Open intent
-        Intent intent = buildIntent(richLocalNotification, getOpenAction());
+        Intent intent = buildIntent(context, richLocalNotification, getOpenAction());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
     }
 
-    protected Intent buildIntent(RichLocalNotification richLocalNotification, String action) {
-        Intent intent = new Intent(context, activity.getClass());
+    protected static Intent buildIntent(Context context, RichLocalNotification richLocalNotification, String action) {
+        Intent intent = new Intent(context, context.getClass());
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -124,7 +122,7 @@ public class RichLocalNotificationManager {
     }
 
     private void dismissVisibleNotification(int notificationId) {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this.context);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.cancel(notificationId);
     }
 
