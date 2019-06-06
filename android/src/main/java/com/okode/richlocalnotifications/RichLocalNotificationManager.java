@@ -46,12 +46,19 @@ public class RichLocalNotificationManager {
             return null;
         }
         dismissVisibleNotification(id);
-        Notification builtNotification = buildNotification(context, richLocalNotification);
-        notificationManager.notify(richLocalNotification.getId(), builtNotification);
+        return postNotification(context, richLocalNotification, context.getClass());
+    }
+
+    public static Integer postNotification(Context context, RichLocalNotification richLocalNotification, Class<?> cls) {
+        if (richLocalNotification == null) { return null; }
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        NotificationCompat.Builder mBuilder = getNotificationBuilder(context, richLocalNotification);
+        createActionIntents(context, cls, richLocalNotification, mBuilder);
+        notificationManager.notify(richLocalNotification.getId(), mBuilder.build());
         return richLocalNotification.getId();
     }
 
-    public static Notification buildNotification(Context context, RichLocalNotification richLocalNotification) {
+    private static NotificationCompat.Builder getNotificationBuilder(Context context, RichLocalNotification richLocalNotification) {
         String channelId = richLocalNotification.getChannelId() != null ?
                 richLocalNotification.getChannelId() : DEFAULT_NOTIFICATION_CHANNEL_ID;
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
@@ -80,10 +87,8 @@ public class RichLocalNotificationManager {
         mBuilder.setVisibility(Notification.VISIBILITY_PRIVATE);
         mBuilder.setOnlyAlertOnce(true);
 
-        mBuilder.setSmallIcon(richLocalNotification.getSmallIcon(context));
-        createActionIntents(context, richLocalNotification, mBuilder);
-        // notificationId is a unique int for each localNotification that you must define
-        return mBuilder.build();
+        mBuilder.setSmallIcon(richLocalNotification.getSmallIconId());
+        return mBuilder;
     }
 
     protected static String getOpenAction() {
@@ -91,15 +96,15 @@ public class RichLocalNotificationManager {
     }
 
     // Create intent for open action
-    protected static void createActionIntents(Context context, RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
+    protected static void createActionIntents(Context context, Class<?> cls, RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
         // Open intent
-        Intent intent = buildIntent(context, richLocalNotification, getOpenAction());
+        Intent intent = buildIntent(context, cls, richLocalNotification, getOpenAction());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
     }
 
-    protected static Intent buildIntent(Context context, RichLocalNotification richLocalNotification, String action) {
-        Intent intent = new Intent(context, context.getClass());
+    protected static Intent buildIntent(Context context, Class<?> cls, RichLocalNotification richLocalNotification, String action) {
+        Intent intent = new Intent(context, cls);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);

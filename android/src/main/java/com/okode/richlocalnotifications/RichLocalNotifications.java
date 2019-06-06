@@ -22,7 +22,7 @@ public class RichLocalNotifications extends Plugin {
     @PluginMethod()
     public void show(PluginCall call) {
         JSONObject notification = call.getObject("notification");
-        RichLocalNotification richLocalNotification = RichLocalNotification.buildNotification(notification);
+        RichLocalNotification richLocalNotification = RichLocalNotification.buildNotification(getContext(), notification);
         if (richLocalNotification == null) {
             call.error("Provided notification format is invalid");
             return;

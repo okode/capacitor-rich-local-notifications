@@ -9,14 +9,23 @@ import org.json.JSONObject;
 
 public class RichLocalNotification {
 
+    public static final String ID = "id";
+    public static final String TITLE = "title";
+    public static final String BODY = "body";
+    public static final String SOUND = "sound";
+    public static final String EXTRA = "extra";
+    public static final String CHANNEL_ID = "channelId";
+    public static final String PRIORITY = "priority";
+    public static final String SMALL_ICON = "smallIcon";
+
     private Integer id;
     private String title;
     private String body;
     private String sound;
-    private JSObject extra;
+    private JSONObject extra;
     private String channelId;
     private Integer priority; // Android 7 or lower notifications priority
-    private String smallIcon;
+    private int smallIconId;
 
     private String source;
 
@@ -52,11 +61,11 @@ public class RichLocalNotification {
         this.sound = sound;
     }
 
-    public JSObject getExtra() {
+    public JSONObject getExtra() {
         return extra;
     }
 
-    public void setExtra(JSObject extra) {
+    public void setExtra(JSONObject extra) {
         this.extra = extra;
     }
 
@@ -76,22 +85,15 @@ public class RichLocalNotification {
         this.priority = priority;
     }
 
-    public int getSmallIcon(Context context) {
-        if (this.smallIcon == null) {
+    public int getSmallIconId() {
+        if (this.smallIconId == 0) {
             return android.R.drawable.ic_dialog_info;
         }
-        return context.getResources().getIdentifier(
-                this.smallIcon,
-                "drawable",
-                context.getPackageName());
+        return this.smallIconId;
     }
 
-    public void setSmallIcon(String smallIcon) {
-        this.smallIcon = smallIcon;
-    }
-
-    public String getSmallIcon() {
-        return smallIcon;
+    public void setSmallIconId(int smallIconId) {
+        this.smallIconId = smallIconId;
     }
 
     public String getSource() {
@@ -102,7 +104,7 @@ public class RichLocalNotification {
         this.source = source;
     }
 
-    public static RichLocalNotification buildNotification(JSONObject jsonNotification) {
+    public static RichLocalNotification buildNotification(Context context, JSONObject jsonNotification) {
         if (jsonNotification == null) {
             return null;
         }
@@ -116,14 +118,23 @@ public class RichLocalNotification {
 
         RichLocalNotification richNotification = new RichLocalNotification();
         richNotification.setSource(notification.toString());
-        richNotification.setId(notification.getInteger("id"));
-        richNotification.setTitle(notification.getString("title"));
-        richNotification.setBody(notification.getString("body"));
-        richNotification.setSound(notification.getString("sound"));
-        richNotification.setExtra(notification.getJSObject("extra"));
-        richNotification.setChannelId(notification.getString("channelId"));
-        richNotification.setPriority(notification.getInteger("priority"));
-        richNotification.setSmallIcon(notification.getString("smallIcon"));
+        richNotification.setId(notification.getInteger(ID));
+        richNotification.setTitle(notification.getString(TITLE));
+        richNotification.setBody(notification.getString(BODY));
+        richNotification.setSound(notification.getString(SOUND));
+        try {
+            richNotification.setExtra(notification.getJSONObject(EXTRA));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        richNotification.setChannelId(notification.getString(CHANNEL_ID));
+        richNotification.setPriority(notification.getInteger(PRIORITY));
+        String smallIconName = notification.getString(SMALL_ICON);
+        if (context != null && smallIconName != null) {
+            int smallIconId = context.getResources().getIdentifier(
+                    smallIconName,"drawable", context.getPackageName());
+            richNotification.setSmallIconId(smallIconId);
+        }
         return richNotification;
     }
 
