@@ -5,15 +5,8 @@ import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
-import com.getcapacitor.plugin.LocalNotifications;
-import com.getcapacitor.plugin.notification.LocalNotification;
-import com.getcapacitor.plugin.notification.LocalNotificationManager;
-import com.getcapacitor.plugin.notification.NotificationStorage;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.List;
 
 @NativePlugin()
 public class RichLocalNotifications extends Plugin {
