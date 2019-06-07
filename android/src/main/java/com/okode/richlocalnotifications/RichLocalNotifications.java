@@ -11,12 +11,12 @@ import org.json.JSONObject;
 @NativePlugin()
 public class RichLocalNotifications extends Plugin {
 
-    protected RichLocalNotificationManager manager;
+    private RichLocalNotificationManager manager;
 
     @Override
     public void load() {
         manager = new RichLocalNotificationManager(getActivity());
-        manager.createNotificationChannel();
+        manager.createDefaultNotificationChannel();
     }
 
     @PluginMethod()

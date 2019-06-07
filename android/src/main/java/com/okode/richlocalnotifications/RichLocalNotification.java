@@ -29,6 +29,8 @@ public class RichLocalNotification {
 
     private String source;
 
+    private RichLocalNotification() { }
+
     public String getTitle() {
         return title;
     }

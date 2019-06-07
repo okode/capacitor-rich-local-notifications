@@ -1,6 +1,5 @@
 package com.okode.richlocalnotifications;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.PendingIntent;
@@ -17,19 +16,23 @@ import com.getcapacitor.plugin.notification.LocalNotificationManager;
 public class RichLocalNotificationManager {
 
     public static final String DEFAULT_NOTIFICATION_CHANNEL_ID = "RichNotifications";
-    public static final String DEFAULT_NOTIFICATION_CHANNEL_NAME = "Local notifications";
+    public static final String DEFAULT_NOTIFICATION_CHANNEL_NAME = "Default";
 
     private static final String DEFAULT_PRESS_ACTION = "tap";
 
     private Context context;
+    private Class<?> mainActivityClazz;
 
-    public RichLocalNotificationManager(Activity activity) {
-        this.context = activity;
-        createNotificationChannel();
+    public RichLocalNotificationManager(Context context) {
+        this.context = context;
+        this.mainActivityClazz = this.context.getClass();
+        createDefaultNotificationChannel();
     }
 
-    public void createNotificationChannel() {
-        createHighPriorityNotificationChannel();
+    public RichLocalNotificationManager(Context context, Class<?> mainActivityClazz) {
+        this.context = context;
+        this.mainActivityClazz = mainActivityClazz;
+        createDefaultNotificationChannel();
     }
 
     public Integer show(PluginCall call, RichLocalNotification richLocalNotification) {
@@ -46,19 +49,23 @@ public class RichLocalNotificationManager {
             return null;
         }
         dismissVisibleNotification(id);
-        return postNotification(context, richLocalNotification, context.getClass());
+        return postNotification(richLocalNotification);
     }
 
-    public static Integer postNotification(Context context, RichLocalNotification richLocalNotification, Class<?> cls) {
+    public Integer postNotification(RichLocalNotification richLocalNotification) {
         if (richLocalNotification == null) { return null; }
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        NotificationCompat.Builder mBuilder = getNotificationBuilder(context, richLocalNotification);
-        createActionIntents(context, cls, richLocalNotification, mBuilder);
+        NotificationCompat.Builder mBuilder = getNotificationBuilder(richLocalNotification);
+        createActionIntents(richLocalNotification, mBuilder);
         notificationManager.notify(richLocalNotification.getId(), mBuilder.build());
         return richLocalNotification.getId();
     }
 
-    private static NotificationCompat.Builder getNotificationBuilder(Context context, RichLocalNotification richLocalNotification) {
+    protected void createDefaultNotificationChannel() {
+        createHighPriorityNotificationChannel();
+    }
+
+    protected NotificationCompat.Builder getNotificationBuilder(RichLocalNotification richLocalNotification) {
         String channelId = richLocalNotification.getChannelId() != null ?
                 richLocalNotification.getChannelId() : DEFAULT_NOTIFICATION_CHANNEL_ID;
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
@@ -91,20 +98,20 @@ public class RichLocalNotificationManager {
         return mBuilder;
     }
 
-    protected static String getOpenAction() {
+    protected String getOpenAction() {
         return DEFAULT_PRESS_ACTION;
     }
 
     // Create intent for open action
-    protected static void createActionIntents(Context context, Class<?> cls, RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
+    protected void createActionIntents(RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
         // Open intent
-        Intent intent = buildIntent(context, cls, richLocalNotification, getOpenAction());
+        Intent intent = buildIntent(richLocalNotification, getOpenAction());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
     }
 
-    protected static Intent buildIntent(Context context, Class<?> cls, RichLocalNotification richLocalNotification, String action) {
-        Intent intent = new Intent(context, cls);
+    protected Intent buildIntent(RichLocalNotification richLocalNotification, String action) {
+        Intent intent = new Intent(context, mainActivityClazz);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
