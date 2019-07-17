@@ -1,3 +1,5 @@
+import { PluginListenerHandle } from "@capacitor/core";
+
 declare module "@capacitor/core" {
   interface PluginRegistry {
     RichLocalNotifications: RichLocalNotificationsPlugin;
@@ -6,6 +8,7 @@ declare module "@capacitor/core" {
 
 export interface RichLocalNotificationsPlugin {
   show(options: { notification: RichLocalNotification }): Promise<RichLocalNotificationShowResult>;
+  addListener(eventName: 'richLocalNotificationActionPerformed', listenerFunc: (notification: RichLocalNotification) => void): PluginListenerHandle;
 }
 
 export interface RichLocalNotification {
