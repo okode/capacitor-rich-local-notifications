@@ -9,15 +9,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
+import com.getcapacitor.JSObject;
+import com.getcapacitor.LogUtils;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.plugin.notification.LocalNotificationManager;
+import com.okode.richlocalnotifications.capacitorrichlocalnotifications.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class RichLocalNotificationManager {
 
-    public static final String DEFAULT_NOTIFICATION_CHANNEL_ID = "RichNotifications";
-    public static final String DEFAULT_NOTIFICATION_CHANNEL_NAME = "Default";
-
+    private static final String NOTIFICATION_INTENT_KEY = "RichLocalNotificationId";
+    private static final String NOTIFICATION_OBJ_INTENT_KEY = "RichLocalNotficationObject";
+    private static final String ACTION_INTENT_KEY = "RichLocalNotificationUserAction";
     private static final String DEFAULT_PRESS_ACTION = "tap";
 
     private Context context;
@@ -33,6 +39,36 @@ public class RichLocalNotificationManager {
         this.context = context;
         this.mainActivityClazz = mainActivityClazz;
         createDefaultNotificationChannel();
+    }
+
+    /**
+     * Method extecuted when notification is launched by user from the notification bar.
+     */
+    public JSObject handleNotificationActionPerformed(Intent data) {
+        Log.d(LogUtils.getPluginTag("RLN"), "RichLocalNotification received: " + data.getDataString());
+        int notificationId = data.getIntExtra(NOTIFICATION_INTENT_KEY, Integer.MIN_VALUE);
+        if (notificationId == Integer.MIN_VALUE) {
+            Log.d(LogUtils.getPluginTag("RLN"), "Activity started without notification attached");
+            return null;
+        }
+        JSObject dataJson = new JSObject();
+
+        String menuAction = data.getStringExtra(ACTION_INTENT_KEY);
+        if (menuAction != DEFAULT_PRESS_ACTION) {
+            dismissVisibleNotification(notificationId);
+        }
+        dataJson.put("actionId", menuAction);
+        JSONObject request = null;
+        try {
+            String notificationJsonString = data.getStringExtra(NOTIFICATION_OBJ_INTENT_KEY);
+            if (notificationJsonString != null) {
+                request = new JSObject(notificationJsonString);
+            }
+        } catch (JSONException e) {
+            Log.e(LogUtils.getPluginTag("RLN"), "Error getting notification data", e);
+        }
+        dataJson.put("notification", request);
+        return dataJson;
     }
 
     public Integer show(PluginCall call, RichLocalNotification richLocalNotification) {
@@ -65,9 +101,17 @@ public class RichLocalNotificationManager {
         createHighPriorityNotificationChannel();
     }
 
+    protected String getDefaultChannelId() {
+        return context.getString(R.string.rich_local_notifications_default_channel_id);
+    }
+
+    protected String getDefaultChannelName() {
+        return context.getString(R.string.rich_local_notifications_default_channel_name);
+    }
+
     protected NotificationCompat.Builder getNotificationBuilder(RichLocalNotification richLocalNotification) {
         String channelId = richLocalNotification.getChannelId() != null ?
-                richLocalNotification.getChannelId() : DEFAULT_NOTIFICATION_CHANNEL_ID;
+                richLocalNotification.getChannelId() : getDefaultChannelId();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
                 .setContentTitle(richLocalNotification.getTitle())
                 .setContentText(richLocalNotification.getBody())
@@ -115,17 +159,17 @@ public class RichLocalNotificationManager {
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra(LocalNotificationManager.NOTIFICATION_INTENT_KEY, richLocalNotification.getId());
-        intent.putExtra(LocalNotificationManager.ACTION_INTENT_KEY, action);
-        intent.putExtra(LocalNotificationManager.NOTIFICATION_OBJ_INTENT_KEY, richLocalNotification.getSource());
+        intent.putExtra(NOTIFICATION_INTENT_KEY, richLocalNotification.getId());
+        intent.putExtra(ACTION_INTENT_KEY, action);
+        intent.putExtra(NOTIFICATION_OBJ_INTENT_KEY, richLocalNotification.getSource());
         return intent;
     }
 
     private void createHighPriorityNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    DEFAULT_NOTIFICATION_CHANNEL_ID,
-                    DEFAULT_NOTIFICATION_CHANNEL_NAME,
+                    getDefaultChannelId(),
+                    getDefaultChannelName(),
                     android.app.NotificationManager.IMPORTANCE_HIGH);
             android.app.NotificationManager notificationManager =
                     context.getSystemService(android.app.NotificationManager.class);
