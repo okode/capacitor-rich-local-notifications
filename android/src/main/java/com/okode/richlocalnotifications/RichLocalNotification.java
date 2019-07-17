@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.LogUtils;
+import com.okode.richlocalnotifications.capacitorrichlocalnotifications.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,7 +97,9 @@ public class RichLocalNotification {
         @JsonProperty
         private Integer priority;
         @JsonProperty
-        private Integer smallIconId;
+        private String smallIcon;
+        @JsonProperty
+        private int smallIconId;
 
         public static Builder from(Context context, JSONObject jsonNotification) {
             Builder builder = new Builder();
@@ -114,7 +117,10 @@ public class RichLocalNotification {
             builder.setId(notification.getString(ID))
                 .setTitle(notification.getString(TITLE))
                 .setBody(notification.getString(BODY))
-                .setSound(notification.getString(SOUND));
+                .setSound(notification.getString(SOUND))
+                .setSmallIcon(context, notification.getString(SMALL_ICON))
+                .setChannelId(notification.getString(CHANNEL_ID))
+                .setPriority(notification.getInteger(PRIORITY));
 
             try {
                 JSONObject extra = notification.getJSONObject(EXTRA);
@@ -126,17 +132,6 @@ public class RichLocalNotification {
             } catch (IOException e) {
                 Log.e(LogUtils.getPluginTag("RLN"), "Error setting notification extras");
             }
-
-            // Setting notification icon
-            String smallIcon = notification.getString(SMALL_ICON);
-            if (context != null && smallIcon != null) {
-                int smallIconId = context.getResources().getIdentifier(
-                        smallIcon,"drawable", context.getPackageName());
-                builder.setSmallIconId(smallIconId);
-            }
-
-            builder.setChannelId(notification.getString(CHANNEL_ID))
-                    .setPriority(notification.getInteger(PRIORITY));
 
             return builder;
         }
@@ -176,8 +171,21 @@ public class RichLocalNotification {
             return this;
         }
 
-        public Builder setSmallIconId(Integer smallIconId) {
+        public Builder setSmallIcon(Context context, String smallIconName) {
+            // Setting notification icon
+            this.smallIcon = smallIconName;
+            if (context != null && this.smallIcon != null) {
+                this.smallIconId = context.getResources().getIdentifier(
+                    this.smallIcon,"drawable", context.getPackageName());
+            }
+            return this;
+        }
+
+        public Builder setSmallIconId(Context context, int smallIconId) {
             this.smallIconId = smallIconId;
+            if (this.smallIconId > 0) {
+                this.smallIcon = context.getResources().getResourceEntryName(smallIconId);
+            }
             return this;
         }
 
