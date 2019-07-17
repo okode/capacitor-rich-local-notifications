@@ -172,7 +172,6 @@ public class RichLocalNotification {
         }
 
         public Builder setSmallIcon(Context context, String smallIconName) {
-            // Setting notification icon
             this.smallIcon = smallIconName;
             if (context != null && this.smallIcon != null) {
                 this.smallIconId = context.getResources().getIdentifier(
