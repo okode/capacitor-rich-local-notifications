@@ -4,10 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.LogUtils;
-import com.okode.richlocalnotifications.capacitorrichlocalnotifications.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,7 +125,9 @@ public class RichLocalNotification {
             try {
                 JSONObject extra = notification.getJSONObject(EXTRA);
                 if (extra != null) {
-                    builder.setExtra(MAPPER.readValue(extra.toString(), HashMap.class));
+                    TypeReference<Map<String,Object>> typeRef = new TypeReference<Map<String,Object>>() {};
+                    Map<String,Object> extras = MAPPER.readValue(extra.toString(), typeRef);
+                    builder.setExtra(extras);
                 }
             } catch (JSONException e) {
                 Log.e(LogUtils.getPluginTag("RLN"), "Error getting notification extras");
@@ -182,7 +184,7 @@ public class RichLocalNotification {
 
         public Builder setSmallIconId(Context context, int smallIconId) {
             this.smallIconId = smallIconId;
-            if (this.smallIconId > 0) {
+            if (this.smallIconId != 0) {
                 this.smallIcon = context.getResources().getResourceEntryName(smallIconId);
             }
             return this;
@@ -198,7 +200,7 @@ public class RichLocalNotification {
             notification.extra = this.extra;
             notification.channelId = this.channelId;
             notification.priority = this.priority;
-            notification.smallIconId = smallIconId;
+            notification.smallIconId = smallIconId != 0 ? smallIconId : android.R.drawable.ic_dialog_info;
 
             try {
                 notification.source = MAPPER.writeValueAsString(this);
