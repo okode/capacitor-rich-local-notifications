@@ -200,7 +200,7 @@ public class RichLocalNotification {
             notification.extra = this.extra;
             notification.channelId = this.channelId;
             notification.priority = this.priority;
-            notification.smallIconId = smallIconId != 0 ? smallIconId : android.R.drawable.ic_dialog_info;
+            notification.smallIconId = this.smallIconId;
 
             try {
                 notification.source = MAPPER.writeValueAsString(this);
