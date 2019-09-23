@@ -1,5 +1,6 @@
 package com.okode.richlocalnotifications;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.PendingIntent;
@@ -14,10 +15,13 @@ import android.util.Log;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.LogUtils;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.plugin.notification.TimedNotificationPublisher;
 import com.okode.richlocalnotifications.capacitorrichlocalnotifications.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Date;
 
 public class RichLocalNotificationManager {
 
@@ -93,7 +97,12 @@ public class RichLocalNotificationManager {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         NotificationCompat.Builder mBuilder = getNotificationBuilder(richLocalNotification);
         createActionIntents(richLocalNotification, mBuilder);
-        notificationManager.notify(richLocalNotification.getId(), mBuilder.build());
+        Notification buildNotification = mBuilder.build();
+        if (richLocalNotification.isScheduled()) {
+            triggerScheduledNotification(buildNotification, richLocalNotification);
+        } else {
+            notificationManager.notify(richLocalNotification.getId(), buildNotification);
+        }
         return richLocalNotification.getId();
     }
 
@@ -176,6 +185,48 @@ public class RichLocalNotificationManager {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+    /**
+     * Build a notification trigger, such as triggering each N seconds, or
+     * on a certain date "shape" (such as every first of the month)
+     */
+    protected void triggerScheduledNotification(Notification notification, RichLocalNotification richLocalNotification) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        RichLocalNotificationSchedule schedule = richLocalNotification.getSchedule();
+        Intent notificationIntent = new Intent(context, TimedNotificationPublisher.class);
+        notificationIntent.putExtra(NOTIFICATION_INTENT_KEY, richLocalNotification.getId());
+        notificationIntent.putExtra(TimedNotificationPublisher.NOTIFICATION_KEY, notification);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, richLocalNotification.getId(), notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // Schedule at specific time (with repeating support)
+        Date at = schedule.getAt();
+        if (at != null) {
+            if (at.getTime() < new Date().getTime()) {
+                Log.e(LogUtils.getPluginTag("RLN"), "Scheduled time must be *after* current time");
+                return;
+            }
+            if (schedule.isRepeating()) {
+                long interval = at.getTime() - new Date().getTime();
+                alarmManager.setRepeating(AlarmManager.RTC, at.getTime(), interval, pendingIntent);
+            } else {
+                alarmManager.setExact(AlarmManager.RTC, at.getTime(), pendingIntent);
+            }
+            return;
+        }
+
+        // Schedule at specific intervals
+        String every = schedule.getEvery();
+        if (every != null) {
+            Long everyInterval = schedule.getEveryInterval();
+            if (everyInterval != null) {
+                long startTime = new Date().getTime() + everyInterval;
+                alarmManager.setRepeating(AlarmManager.RTC, startTime, everyInterval, pendingIntent);
+            }
+            return;
+        }
+
+    }
+
 
     private void dismissVisibleNotification(int notificationId) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);

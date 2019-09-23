@@ -13,7 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.text.ParseException;
 import java.util.Map;
 
 public class RichLocalNotification {
@@ -26,6 +26,7 @@ public class RichLocalNotification {
     private String channelId;
     private Integer priority; // Android 7 or lower notifications priority
     private int smallIconId;
+    private RichLocalNotificationSchedule schedule;
     private String source; // Raw notification
 
     private RichLocalNotification() { }
@@ -69,6 +70,14 @@ public class RichLocalNotification {
         return this.source;
     }
 
+    public RichLocalNotificationSchedule getSchedule() {
+        return schedule;
+    }
+
+    public boolean isScheduled() {
+        return this.schedule != null;
+    }
+
     public static class Builder {
 
         private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -81,6 +90,7 @@ public class RichLocalNotification {
         private static final String CHANNEL_ID = "channelId";
         private static final String PRIORITY = "priority";
         private static final String SMALL_ICON = "smallIcon";
+        private static final String SCHEDULE = "schedule";
 
         @JsonProperty
         private String id;
@@ -100,6 +110,8 @@ public class RichLocalNotification {
         private String smallIcon;
         @JsonProperty
         private int smallIconId;
+        @JsonProperty
+        private RichLocalNotificationSchedule richLocalNotificationSchedule;
 
         public static Builder from(Context context, JSONObject jsonNotification) {
             Builder builder = new Builder();
@@ -133,6 +145,13 @@ public class RichLocalNotification {
                 Log.e(LogUtils.getPluginTag("RLN"), "Error getting notification extras");
             } catch (IOException e) {
                 Log.e(LogUtils.getPluginTag("RLN"), "Error setting notification extras");
+            }
+
+            // Schedule
+            try {
+                builder.setSchedule(RichLocalNotificationSchedule.buildFromJson(notification.getJSObject("schedule")));
+            } catch (ParseException e) {
+                Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification schedule date");
             }
 
             return builder;
@@ -187,6 +206,11 @@ public class RichLocalNotification {
             if (this.smallIconId != 0) {
                 this.smallIcon = context.getResources().getResourceEntryName(smallIconId);
             }
+            return this;
+        }
+
+        public Builder setSchedule(RichLocalNotificationSchedule schedule) {
+            this.richLocalNotificationSchedule = schedule;
             return this;
         }
 

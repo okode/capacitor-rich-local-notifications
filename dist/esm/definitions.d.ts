@@ -19,6 +19,12 @@ export interface RichLocalNotification {
     channelId?: string;
     priority?: number;
     smallIcon?: string;
+    schedule: RichLocalNotificationSchedule;
+}
+export interface RichLocalNotificationSchedule {
+    at?: Date;
+    repeats?: boolean;
+    every?: 'year' | 'month' | 'two-weeks' | 'week' | 'day' | 'hour' | 'minute' | 'second';
 }
 export interface RichLocalNotificationShowResult {
     id: string;
