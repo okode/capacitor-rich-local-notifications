@@ -19,7 +19,7 @@ export interface RichLocalNotification {
     channelId?: string;
     priority?: number;
     smallIcon?: string;
-    schedule: RichLocalNotificationSchedule;
+    schedule?: RichLocalNotificationSchedule;
 }
 export interface RichLocalNotificationSchedule {
     at?: Date;

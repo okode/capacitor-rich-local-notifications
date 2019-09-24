@@ -20,7 +20,7 @@ export interface RichLocalNotification {
   channelId?: string; // Android 8+ prop
   priority?: number; // Android 7- prop
   smallIcon?: string; // Android notification icon
-  schedule: RichLocalNotificationSchedule;
+  schedule?: RichLocalNotificationSchedule;
 }
 
 export interface RichLocalNotificationSchedule {
