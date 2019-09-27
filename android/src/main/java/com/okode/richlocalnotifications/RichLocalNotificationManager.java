@@ -1,11 +1,14 @@
 package com.okode.richlocalnotifications;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
@@ -131,7 +134,7 @@ public class RichLocalNotificationManager {
         if (richLocalNotification.getPriority() != null) {
             mBuilder.setPriority(richLocalNotification.getPriority());
         } else {
-            mBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+            mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
         }
 
         String sound = richLocalNotification.getSound();
@@ -176,10 +179,17 @@ public class RichLocalNotificationManager {
 
     private void createHighPriorityNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
+            // It seems an Android bug because IMPORTANCE_MAX is an allowed constant
+            @SuppressLint("WrongConstant") NotificationChannel channel = new NotificationChannel(
                     getDefaultChannelId(),
-                    getDefaultChannelName(),
-                    android.app.NotificationManager.IMPORTANCE_HIGH);
+                    getDefaultChannelName(), NotificationManager.IMPORTANCE_MAX);
+            channel.setShowBadge(true);
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build();
+            channel.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI, audioAttributes);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.enableVibration(true);
             android.app.NotificationManager notificationManager =
                     context.getSystemService(android.app.NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
