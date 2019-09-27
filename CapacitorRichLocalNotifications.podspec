@@ -1,7 +1,7 @@
 
   Pod::Spec.new do |s|
     s.name = 'CapacitorRichLocalNotifications'
-    s.version = '0.0.3'
+    s.version = '0.0.4'
     s.summary = 'Plugin to present rich local notifications'
     s.license = 'MIT'
     s.homepage = 'https://github.com/okode/capacitor-rich-local-notifications'
