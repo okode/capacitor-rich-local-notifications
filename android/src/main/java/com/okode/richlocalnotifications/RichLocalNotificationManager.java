@@ -1,6 +1,5 @@
 package com.okode.richlocalnotifications;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -179,10 +178,9 @@ public class RichLocalNotificationManager {
 
     private void createHighPriorityNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // It seems an Android bug because IMPORTANCE_MAX is an allowed constant
-            @SuppressLint("WrongConstant") NotificationChannel channel = new NotificationChannel(
+            NotificationChannel channel = new NotificationChannel(
                     getDefaultChannelId(),
-                    getDefaultChannelName(), NotificationManager.IMPORTANCE_MAX);
+                    getDefaultChannelName(), NotificationManager.IMPORTANCE_HIGH);
             channel.setShowBadge(true);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
