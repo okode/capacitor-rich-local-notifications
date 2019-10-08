@@ -149,7 +149,8 @@ public class RichLocalNotification {
 
             // Schedule
             try {
-                builder.setSchedule(RichLocalNotificationSchedule.buildFromJson(notification.getJSObject("schedule")));
+                JSObject schedule = notification.getJSObject(SCHEDULE);
+                builder.setSchedule(RichLocalNotificationSchedule.buildFromJson(schedule));
             } catch (ParseException e) {
                 Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification schedule date");
             }

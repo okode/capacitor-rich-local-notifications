@@ -7,7 +7,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
@@ -123,33 +122,28 @@ public class RichLocalNotificationManager {
     protected NotificationCompat.Builder getNotificationBuilder(RichLocalNotification richLocalNotification) {
         String channelId = richLocalNotification.getChannelId() != null ?
                 richLocalNotification.getChannelId() : getDefaultChannelId();
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, channelId)
                 .setContentTitle(richLocalNotification.getTitle())
                 .setContentText(richLocalNotification.getBody())
                 .setAutoCancel(true)
                 .setOngoing(false)
-                .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setOnlyAlertOnce(true)
+                .setSmallIcon(richLocalNotification.getSmallIconId())
+                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
 
+        // Set priority
         if (richLocalNotification.getPriority() != null) {
             mBuilder.setPriority(richLocalNotification.getPriority());
         } else {
             mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
         }
 
-        String sound = richLocalNotification.getSound();
-        if (sound != null) {
-            Uri soundUri = Uri.parse(sound);
-            // Grant permission to use sound
-            context.grantUriPermission(
-                    "com.android.systemui", soundUri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            mBuilder.setSound(soundUri);
-        }
+        // Set sound
+        Uri sound = RichLocalNotificationUtils.getSound(context, richLocalNotification.getSound());
+        mBuilder.setSound(sound);
 
-        mBuilder.setVisibility(Notification.VISIBILITY_PRIVATE);
-        mBuilder.setOnlyAlertOnce(true);
-
-        mBuilder.setSmallIcon(richLocalNotification.getSmallIconId());
         return mBuilder;
     }
 
@@ -178,16 +172,13 @@ public class RichLocalNotificationManager {
 
     private void createHighPriorityNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
+            NotificationChannel channel = new RichLocalNotificationChannelBuilder(
                     getDefaultChannelId(),
-                    getDefaultChannelName(), NotificationManager.IMPORTANCE_HIGH);
-            channel.setShowBadge(true);
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build();
-            channel.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI, audioAttributes);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            channel.enableVibration(true);
+                    getDefaultChannelName(), NotificationManager.IMPORTANCE_HIGH)
+                    .setShowBadge(true)
+                    .setEnableVibration(true)
+                    .setLockScreenVisibility(Notification.VISIBILITY_PUBLIC)
+                    .build(this.context);
             android.app.NotificationManager notificationManager =
                     context.getSystemService(android.app.NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
