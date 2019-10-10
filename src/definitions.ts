@@ -34,6 +34,6 @@ export interface RichLocalNotificationShowResult {
 }
 
 export interface RichLocalNotificationActionPerformed {
-  actionId: number;
+  actionId: string;
   notification: RichLocalNotification;
 }
