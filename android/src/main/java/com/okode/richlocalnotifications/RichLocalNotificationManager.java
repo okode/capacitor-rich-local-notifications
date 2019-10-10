@@ -151,12 +151,20 @@ public class RichLocalNotificationManager {
         return DEFAULT_PRESS_ACTION;
     }
 
-    // Create intent for open action
     protected void createActionIntents(RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
         // Open intent
         Intent intent = buildIntent(richLocalNotification, getOpenAction());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
+
+        // Dismiss intent
+        Intent dissmissIntent = new Intent(context, RichLocalNotificationDismissReceiver.class);
+        dissmissIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        dissmissIntent.putExtra(NOTIFICATION_INTENT_KEY, richLocalNotification.getId());
+        dissmissIntent.putExtra(ACTION_INTENT_KEY, "dismiss");
+        PendingIntent deleteIntent = PendingIntent.getBroadcast(
+                context, richLocalNotification.getId(), dissmissIntent, 0);
+        mBuilder.setDeleteIntent(deleteIntent);
     }
 
     protected Intent buildIntent(RichLocalNotification richLocalNotification, String action) {
