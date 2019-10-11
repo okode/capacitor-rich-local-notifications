@@ -2,10 +2,12 @@ package com.okode.richlocalnotifications;
 
 import android.content.Intent;
 
+import com.getcapacitor.Bridge;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginHandle;
 import com.getcapacitor.PluginMethod;
 
 import org.json.JSONObject;
@@ -14,10 +16,13 @@ import org.json.JSONObject;
 @NativePlugin()
 public class RichLocalNotifications extends Plugin {
 
+    private static Bridge staticBridge = null;
+
     private RichLocalNotificationManager manager;
 
     @Override
     public void load() {
+        staticBridge = this.bridge;
         manager = new RichLocalNotificationManager(getActivity());
         manager.createDefaultNotificationChannel();
     }
@@ -29,9 +34,7 @@ public class RichLocalNotifications extends Plugin {
             return;
         }
         JSObject dataJson = manager.handleNotificationActionPerformed(data);
-        if (dataJson != null) {
-            notifyListeners("richLocalNotificationActionPerformed", dataJson, true);
-        }
+        fireNotificationActionPerformed(dataJson);
     }
 
     @PluginMethod()
@@ -44,8 +47,32 @@ public class RichLocalNotifications extends Plugin {
         call.success(new JSObject().put("id", id));
     }
 
+    private void fireNotificationActionPerformed(JSObject dataJson) {
+        if (dataJson != null) {
+            notifyListeners("richLocalNotificationActionPerformed", dataJson, true);
+        }
+    }
+
     protected void setNotificationsManager(RichLocalNotificationManager manager) {
         this.manager = manager;
+    }
+
+    public static void sendNotificationActionPerformed(JSObject dataJson) {
+        RichLocalNotifications plugin = RichLocalNotifications.getPluginInstance();
+        if (plugin != null) {
+            plugin.fireNotificationActionPerformed(dataJson);
+        }
+    }
+
+    public static RichLocalNotifications getPluginInstance() {
+        if (staticBridge != null && staticBridge.getWebView() != null) {
+            PluginHandle handle = staticBridge.getPlugin("RichLocalNotifications");
+            if (handle == null) {
+                return null;
+            }
+            return (RichLocalNotifications) handle.getInstance();
+        }
+        return null;
     }
 
 }

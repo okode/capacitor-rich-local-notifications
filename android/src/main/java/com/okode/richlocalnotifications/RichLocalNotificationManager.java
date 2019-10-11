@@ -30,6 +30,7 @@ public class RichLocalNotificationManager {
     private static final String NOTIFICATION_OBJ_INTENT_KEY = "RichLocalNotficationObject";
     private static final String ACTION_INTENT_KEY = "RichLocalNotificationUserAction";
     private static final String DEFAULT_PRESS_ACTION = "tap";
+    private static final String DEFAULT_DISMISS_ACTION = "dismiss";
 
     private Context context;
     private Class<?> mainActivityClazz;
@@ -153,21 +154,18 @@ public class RichLocalNotificationManager {
 
     protected void createActionIntents(RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
         // Open intent
-        Intent intent = buildIntent(richLocalNotification, getOpenAction());
+        Intent intent = buildOpenIntent(richLocalNotification, getOpenAction());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         // Dismiss intent
-        Intent dissmissIntent = new Intent(context, RichLocalNotificationDismissReceiver.class);
-        dissmissIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        dissmissIntent.putExtra(NOTIFICATION_INTENT_KEY, richLocalNotification.getId());
-        dissmissIntent.putExtra(ACTION_INTENT_KEY, "dismiss");
+        Intent dissmissIntent = buildDismissIntent(richLocalNotification);
         PendingIntent deleteIntent = PendingIntent.getBroadcast(
                 context, richLocalNotification.getId(), dissmissIntent, 0);
         mBuilder.setDeleteIntent(deleteIntent);
     }
 
-    protected Intent buildIntent(RichLocalNotification richLocalNotification, String action) {
+    protected Intent buildOpenIntent(RichLocalNotification richLocalNotification, String action) {
         Intent intent = new Intent(context, mainActivityClazz);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -176,6 +174,15 @@ public class RichLocalNotificationManager {
         intent.putExtra(ACTION_INTENT_KEY, action);
         intent.putExtra(NOTIFICATION_OBJ_INTENT_KEY, richLocalNotification.getSource());
         return intent;
+    }
+
+    protected Intent buildDismissIntent(RichLocalNotification richLocalNotification) {
+        Intent dissmissIntent = new Intent(context, RichLocalNotificationDismissReceiver.class);
+        dissmissIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        dissmissIntent.putExtra(NOTIFICATION_INTENT_KEY, richLocalNotification.getId());
+        dissmissIntent.putExtra(ACTION_INTENT_KEY, DEFAULT_DISMISS_ACTION);
+        dissmissIntent.putExtra(NOTIFICATION_OBJ_INTENT_KEY, richLocalNotification.getSource());
+        return dissmissIntent;
     }
 
     private void createHighPriorityNotificationChannel() {
