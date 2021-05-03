@@ -7,8 +7,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -145,6 +147,15 @@ public class RichLocalNotificationManager {
         // Set sound
         Uri sound = RichLocalNotificationUtils.getSound(context, richLocalNotification.getSound());
         mBuilder.setSound(sound);
+
+        // Set picture
+        RichLocalNotificationAttachment attachment = richLocalNotification.getAttachment();
+        if (attachment != null && !TextUtils.isEmpty(attachment.getUrl())) {
+          Bitmap picture = RichLocalNotificationUtils.createImageBitmap(attachment.getUrl());
+          if (picture != null) {
+            mBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(picture));
+          }
+        }
 
         return mBuilder;
     }

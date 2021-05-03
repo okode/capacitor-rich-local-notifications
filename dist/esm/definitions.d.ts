@@ -20,11 +20,15 @@ export interface RichLocalNotification {
     priority?: number;
     smallIcon?: string;
     schedule?: RichLocalNotificationSchedule;
+    attachment?: RichLocalNotificationAttachment;
 }
 export interface RichLocalNotificationSchedule {
     at?: Date;
     repeats?: boolean;
     every?: 'year' | 'month' | 'two-weeks' | 'week' | 'day' | 'hour' | 'minute' | 'second';
+}
+export interface RichLocalNotificationAttachment {
+    url: string;
 }
 export interface RichLocalNotificationShowResult {
     id: string;

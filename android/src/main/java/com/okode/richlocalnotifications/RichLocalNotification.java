@@ -27,6 +27,7 @@ public class RichLocalNotification {
     private Integer priority; // Android 7 or lower notifications priority
     private int smallIconId;
     private RichLocalNotificationSchedule schedule;
+    private RichLocalNotificationAttachment attachment;
     private String source; // Raw notification
 
     private RichLocalNotification() { }
@@ -78,6 +79,10 @@ public class RichLocalNotification {
         return this.schedule != null;
     }
 
+    public RichLocalNotificationAttachment getAttachment() {
+      return attachment;
+    }
+
     public static class Builder {
 
         private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -91,6 +96,7 @@ public class RichLocalNotification {
         private static final String PRIORITY = "priority";
         private static final String SMALL_ICON = "smallIcon";
         private static final String SCHEDULE = "schedule";
+        private static final String ATTACHMENT = "attachment";
 
         @JsonProperty
         private String id;
@@ -112,6 +118,9 @@ public class RichLocalNotification {
         private int smallIconId;
         @JsonProperty
         private RichLocalNotificationSchedule richLocalNotificationSchedule;
+        @JsonProperty
+        private RichLocalNotificationAttachment richLocalNotificationAttachment;
+
 
         public static Builder from(Context context, JSONObject jsonNotification) {
             Builder builder = new Builder();
@@ -153,6 +162,14 @@ public class RichLocalNotification {
                 builder.setSchedule(RichLocalNotificationSchedule.buildFromJson(schedule));
             } catch (ParseException e) {
                 Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification schedule date");
+            }
+
+            // Attachment
+            try {
+              JSObject attachment = notification.getJSObject(ATTACHMENT);
+              builder.setAttachment(RichLocalNotificationAttachment.buildFromJson(attachment));
+            } catch (ParseException e) {
+              Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification attachment");
             }
 
             return builder;
@@ -213,6 +230,11 @@ public class RichLocalNotification {
         public Builder setSchedule(RichLocalNotificationSchedule schedule) {
             this.richLocalNotificationSchedule = schedule;
             return this;
+        }
+
+        public Builder setAttachment(RichLocalNotificationAttachment attachment) {
+          this.richLocalNotificationAttachment = attachment;
+          return this;
         }
 
         public RichLocalNotification build() {

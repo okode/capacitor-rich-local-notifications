@@ -21,12 +21,17 @@ export interface RichLocalNotification {
   priority?: number; // Android 7- prop
   smallIcon?: string; // Android notification icon
   schedule?: RichLocalNotificationSchedule;
+  attachment?: RichLocalNotificationAttachment;
 }
 
 export interface RichLocalNotificationSchedule {
   at?: Date;
   repeats?: boolean;
   every?: 'year' | 'month' | 'two-weeks' | 'week' | 'day' | 'hour' | 'minute' | 'second';
+}
+
+export interface RichLocalNotificationAttachment {
+  url: string;
 }
 
 export interface RichLocalNotificationShowResult {
