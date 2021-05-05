@@ -117,9 +117,9 @@ public class RichLocalNotification {
         @JsonProperty
         private int smallIconId;
         @JsonProperty
-        private RichLocalNotificationSchedule richLocalNotificationSchedule;
+        private RichLocalNotificationSchedule schedule;
         @JsonProperty
-        private RichLocalNotificationAttachment richLocalNotificationAttachment;
+        private RichLocalNotificationAttachment attachment;
 
 
         public static Builder from(Context context, JSONObject jsonNotification) {
@@ -228,13 +228,13 @@ public class RichLocalNotification {
         }
 
         public Builder setSchedule(RichLocalNotificationSchedule schedule) {
-            this.richLocalNotificationSchedule = schedule;
+            this.schedule = schedule;
             return this;
         }
 
         public Builder setAttachment(RichLocalNotificationAttachment attachment) {
-          this.richLocalNotificationAttachment = attachment;
-          return this;
+            this.attachment = attachment;
+            return this;
         }
 
         public RichLocalNotification build() {
@@ -248,6 +248,8 @@ public class RichLocalNotification {
             notification.channelId = this.channelId;
             notification.priority = this.priority;
             notification.smallIconId = this.smallIconId;
+            notification.schedule = this.schedule;
+            notification.attachment = this.attachment;
 
             try {
                 notification.source = MAPPER.writeValueAsString(this);
