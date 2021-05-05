@@ -10,8 +10,10 @@ import java.text.ParseException;
 public class RichLocalNotificationAttachment {
 
     private static final String URL = "url";
+    private static final String ALT_TEXT = "altText";
 
     private String url;
+    private String altText;
 
     public RichLocalNotificationAttachment() { }
 
@@ -21,6 +23,7 @@ public class RichLocalNotificationAttachment {
         RichLocalNotificationAttachment attachment = new RichLocalNotificationAttachment();
 
         attachment.setUrl(jsonAttachment.getString(URL));
+        attachment.setAltText(jsonAttachment.getString(ALT_TEXT));
 
         return attachment;
     }
@@ -30,12 +33,20 @@ public class RichLocalNotificationAttachment {
     }
 
     public void setUrl(String url) {
-      boolean isHttpUrl = url != null && (url.startsWith("http") || url.startsWith("https"));
-      if (isHttpUrl) {
-        this.url = url;
-      } else {
-        Log.e(LogUtils.getPluginTag("RLN"), "Ignored nonHttp attachment");
-      }
+        boolean isHttpUrl = url != null && (url.startsWith("http") || url.startsWith("https"));
+        if (isHttpUrl) {
+          this.url = url;
+        } else {
+          Log.e(LogUtils.getPluginTag("RLN"), "Ignored nonHttp attachment");
+        }
+    }
+
+    public String getAltText() {
+        return altText;
+    }
+
+    public void setAltText(String altText) {
+        this.altText = altText;
     }
 
 }

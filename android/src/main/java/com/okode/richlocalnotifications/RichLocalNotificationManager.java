@@ -151,10 +151,12 @@ public class RichLocalNotificationManager {
         // Set picture
         RichLocalNotificationAttachment attachment = richLocalNotification.getAttachment();
         if (attachment != null && !TextUtils.isEmpty(attachment.getUrl())) {
-          Bitmap picture = RichLocalNotificationUtils.createImageBitmap(attachment.getUrl());
-          if (picture != null) {
-            mBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(picture));
-          }
+            Bitmap picture = RichLocalNotificationUtils.createImageBitmap(attachment.getUrl());
+            if (picture != null) {
+                mBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(picture));
+            } else if (!TextUtils.isEmpty(attachment.getAltText())) {
+                mBuilder.setContentText(attachment.getAltText());
+            }
         }
 
         return mBuilder;

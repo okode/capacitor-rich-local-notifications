@@ -31,18 +31,18 @@ public class RichLocalNotificationUtils {
     }
 
     public static Bitmap createImageBitmap(String url) {
-      try {
-        URL var1 = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection)var1.openConnection();
-        connection.setDoInput(true);
-        connection.setReadTimeout(30000);
-        connection.setConnectTimeout(30000);
-        connection.connect();
-        return BitmapFactory.decodeStream(connection.getInputStream());
-      } catch (Exception e) {
-        Log.e(LogUtils.getPluginTag("RLN"), "Unable to download image", e);
-        return null;
-      }
+        try {
+            URL var1 = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection)var1.openConnection();
+            connection.setDoInput(true);
+            connection.setReadTimeout(30000);
+            connection.setConnectTimeout(30000);
+            connection.connect();
+            return BitmapFactory.decodeStream(connection.getInputStream());
+        } catch (Exception e) {
+            Log.e(LogUtils.getPluginTag("RLN"), "Unable to download image", e);
+            return null;
+        }
     }
 
 }
