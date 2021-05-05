@@ -29,6 +29,7 @@ export interface RichLocalNotificationSchedule {
 }
 export interface RichLocalNotificationAttachment {
     url: string;
+    altText?: string;
 }
 export interface RichLocalNotificationShowResult {
     id: string;
