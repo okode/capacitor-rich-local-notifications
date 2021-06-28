@@ -17,9 +17,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.getcapacitor.JSObject;
-import com.getcapacitor.LogUtils;
 import com.getcapacitor.PluginCall;
-import com.getcapacitor.plugin.notification.TimedNotificationPublisher;
 import com.okode.richlocalnotifications.capacitorrichlocalnotifications.R;
 
 import org.json.JSONException;
@@ -29,7 +27,8 @@ import java.util.Date;
 
 public class RichLocalNotificationManager {
 
-    private static final String NOTIFICATION_INTENT_KEY = "RichLocalNotificationId";
+    public static final String NOTIFICATION_INTENT_KEY = "RichLocalNotificationId";
+
     private static final String NOTIFICATION_OBJ_INTENT_KEY = "RichLocalNotficationObject";
     private static final String ACTION_INTENT_KEY = "RichLocalNotificationUserAction";
     private static final String DEFAULT_PRESS_ACTION = "tap";
@@ -39,9 +38,7 @@ public class RichLocalNotificationManager {
     private Class<?> mainActivityClazz;
 
     public RichLocalNotificationManager(Context context) {
-        this.context = context;
-        this.mainActivityClazz = this.context.getClass();
-        createDefaultNotificationChannel();
+        this(context, context.getClass());
     }
 
     public RichLocalNotificationManager(Context context, Class<?> mainActivityClazz) {
@@ -54,10 +51,10 @@ public class RichLocalNotificationManager {
      * Method extecuted when notification is launched by user from the notification bar.
      */
     public JSObject handleNotificationActionPerformed(Intent data) {
-        Log.d(LogUtils.getPluginTag("RLN"), "RichLocalNotification received: " + data.getDataString());
+        Log.d("RLN", "RichLocalNotification received: " + data.getDataString());
         int notificationId = data.getIntExtra(NOTIFICATION_INTENT_KEY, Integer.MIN_VALUE);
         if (notificationId == Integer.MIN_VALUE) {
-            Log.d(LogUtils.getPluginTag("RLN"), "Activity started without notification attached");
+            Log.d("RLN", "Activity started without notification attached");
             return null;
         }
         JSObject dataJson = new JSObject();
@@ -74,7 +71,7 @@ public class RichLocalNotificationManager {
                 request = new JSObject(notificationJsonString);
             }
         } catch (JSONException e) {
-            Log.e(LogUtils.getPluginTag("RLN"), "Error getting notification data", e);
+            Log.e("RLN", "Error getting notification data", e);
         }
         dataJson.put("notification", request);
         return dataJson;
@@ -230,7 +227,7 @@ public class RichLocalNotificationManager {
         Date at = schedule.getAt();
         if (at != null) {
             if (at.getTime() < new Date().getTime()) {
-                Log.e(LogUtils.getPluginTag("RLN"), "Scheduled time must be *after* current time");
+                Log.e("RLN", "Scheduled time must be *after* current time");
                 return;
             }
             if (schedule.isRepeating()) {
