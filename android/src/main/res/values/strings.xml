@@ -1,4 +1,0 @@
-<resources>
-    <string name="rich_local_notifications_default_channel_id">RichNotifications</string>
-    <string name="rich_local_notifications_default_channel_name">Default</string>
-</resources>

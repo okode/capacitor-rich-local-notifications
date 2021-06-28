@@ -1,4 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
+
 import type { RichLocalNotificationsPlugin, RichLocalNotification, RichLocalNotificationShowResult } from './definitions';
 
 export class RichLocalNotificationsWeb extends WebPlugin implements RichLocalNotificationsPlugin {
