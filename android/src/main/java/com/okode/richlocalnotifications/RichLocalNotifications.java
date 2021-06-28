@@ -9,11 +9,12 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginHandle;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
 
 import org.json.JSONObject;
 
 
-@NativePlugin()
+@CapacitorPlugin()
 public class RichLocalNotifications extends Plugin {
 
     private static Bridge staticBridge = null;
@@ -44,7 +45,7 @@ public class RichLocalNotifications extends Plugin {
                 .from(getContext(), notification)
                 .build();
         Integer id = manager.show(call, richLocalNotification);
-        call.success(new JSObject().put("id", id));
+        call.resolve(new JSObject().put("id", id));
     }
 
     private void fireNotificationActionPerformed(JSObject dataJson) {
