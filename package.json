@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "CapacitorExitAppIos.podspec"
+    "CapacitorRichLocalNotifications.podspec"
   ],
   "author": "Okode",
   "license": "MIT",
