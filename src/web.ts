@@ -4,9 +4,9 @@ import type { RichLocalNotificationsPlugin, RichLocalNotification, RichLocalNoti
 
 export class RichLocalNotificationsWeb extends WebPlugin implements RichLocalNotificationsPlugin {
 
-  show(options: { notification: RichLocalNotification; }): Promise<RichLocalNotificationShowResult> {
+  async show(options: { notification: RichLocalNotification; }): Promise<RichLocalNotificationShowResult> {
     console.log('Show notification', options);
-    return Promise.reject('Method not implemented.');
+    throw this.unimplemented('Not implemented on web.');
   }
 
 }

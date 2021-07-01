@@ -1,4 +1,4 @@
-import { PluginListenerHandle } from "@capacitor/core";
+import type { PluginListenerHandle } from "@capacitor/core";
 
 export interface RichLocalNotificationsPlugin {
   show(options: { notification: RichLocalNotification }): Promise<RichLocalNotificationShowResult>;
