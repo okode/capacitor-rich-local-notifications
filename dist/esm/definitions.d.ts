@@ -1,9 +1,4 @@
 import { PluginListenerHandle } from "@capacitor/core";
-declare module "@capacitor/core" {
-    interface PluginRegistry {
-        RichLocalNotifications: RichLocalNotificationsPlugin;
-    }
-}
 export interface RichLocalNotificationsPlugin {
     show(options: {
         notification: RichLocalNotification;

@@ -7,8 +7,8 @@ import Capacitor
  */
 @objc(RichLocalNotifications)
 public class RichLocalNotifications: CAPPlugin {
-    
+
     @objc func show(_ call: CAPPluginCall) {
-        call.error("Method not implemented")
+        call.reject("Method not implemented")
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.getcapacitor.JSObject;
-import com.getcapacitor.LogUtils;
 
 
 /**
@@ -18,7 +17,7 @@ public class RichLocalNotificationDismissReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
-    Log.i(LogUtils.getPluginTag("RLN"), "Dimissing local notification");
+    Log.i("RLN", "Dimissing local notification");
     JSObject dataJson = getRichLocalNotificationManagerInstance(context).handleNotificationActionPerformed(intent);
     RichLocalNotifications.sendNotificationActionPerformed(dataJson);
   }

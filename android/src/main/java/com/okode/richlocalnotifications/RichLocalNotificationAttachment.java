@@ -3,7 +3,6 @@ package com.okode.richlocalnotifications;
 import android.util.Log;
 
 import com.getcapacitor.JSObject;
-import com.getcapacitor.LogUtils;
 
 import java.text.ParseException;
 
@@ -37,7 +36,7 @@ public class RichLocalNotificationAttachment {
         if (isHttpUrl) {
           this.url = url;
         } else {
-          Log.e(LogUtils.getPluginTag("RLN"), "Ignored nonHttp attachment");
+          Log.e("RLN", "Ignored nonHttp attachment");
         }
     }
 

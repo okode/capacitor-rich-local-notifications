@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.getcapacitor.JSObject;
-import com.getcapacitor.LogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -151,9 +150,9 @@ public class RichLocalNotification {
                     builder.setExtra(extras);
                 }
             } catch (JSONException e) {
-                Log.e(LogUtils.getPluginTag("RLN"), "Error getting notification extras");
+                Log.e("RLN", "Error getting notification extras");
             } catch (IOException e) {
-                Log.e(LogUtils.getPluginTag("RLN"), "Error setting notification extras");
+                Log.e("RLN", "Error setting notification extras");
             }
 
             // Schedule
@@ -161,7 +160,7 @@ public class RichLocalNotification {
                 JSObject schedule = notification.getJSObject(SCHEDULE);
                 builder.setSchedule(RichLocalNotificationSchedule.buildFromJson(schedule));
             } catch (ParseException e) {
-                Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification schedule date");
+                Log.e("RLN", "Invalid notification schedule date");
             }
 
             // Attachment
@@ -169,7 +168,7 @@ public class RichLocalNotification {
               JSObject attachment = notification.getJSObject(ATTACHMENT);
               builder.setAttachment(RichLocalNotificationAttachment.buildFromJson(attachment));
             } catch (ParseException e) {
-              Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification attachment");
+              Log.e("RLN", "Invalid notification attachment");
             }
 
             return builder;
@@ -254,7 +253,7 @@ public class RichLocalNotification {
             try {
                 notification.source = MAPPER.writeValueAsString(this);
             } catch (IOException e) {
-                Log.e(LogUtils.getPluginTag("RLN"), "Error setting notification source", e);
+                Log.e("RLN", "Error setting notification source", e);
             }
 
             return notification;
@@ -265,7 +264,7 @@ public class RichLocalNotification {
             try {
                 notificationId = Integer.valueOf(this.id);
             } catch (NumberFormatException e) {
-                Log.e(LogUtils.getPluginTag("RLN"), "Invalid notification ID. Using 0 as default one", e);
+                Log.e("RLN", "Invalid notification ID. Using 0 as default one", e);
             }
             return notificationId;
         }

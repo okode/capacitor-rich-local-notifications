@@ -7,8 +7,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
-import com.getcapacitor.LogUtils;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -40,7 +38,7 @@ public class RichLocalNotificationUtils {
             connection.connect();
             return BitmapFactory.decodeStream(connection.getInputStream());
         } catch (Exception e) {
-            Log.e(LogUtils.getPluginTag("RLN"), "Unable to download image", e);
+            Log.e("RLN", "Unable to download image", e);
             return null;
         }
     }

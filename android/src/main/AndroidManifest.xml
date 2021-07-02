@@ -3,6 +3,7 @@
       package="com.okode.richlocalnotifications.capacitorrichlocalnotifications">
     <application>
       <receiver android:name="com.okode.richlocalnotifications.RichLocalNotificationDismissReceiver" />
+      <receiver android:name="com.okode.richlocalnotifications.TimedNotificationPublisher" />
     </application>
   </manifest>
   
