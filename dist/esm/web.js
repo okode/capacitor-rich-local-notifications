@@ -1,8 +1,8 @@
 import { WebPlugin } from '@capacitor/core';
 export class RichLocalNotificationsWeb extends WebPlugin {
-    show(options) {
+    async show(options) {
         console.log('Show notification', options);
-        return Promise.reject('Method not implemented.');
+        throw this.unimplemented('Not implemented on web.');
     }
 }
 //# sourceMappingURL=web.js.map
