@@ -9,9 +9,9 @@ const RichLocalNotifications = core.registerPlugin('RichLocalNotifications', {
 });
 
 class RichLocalNotificationsWeb extends core.WebPlugin {
-    show(options) {
+    async show(options) {
         console.log('Show notification', options);
-        return Promise.reject('Method not implemented.');
+        throw this.unimplemented('Not implemented on web.');
     }
 }
 
