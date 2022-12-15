@@ -166,13 +166,21 @@ public class RichLocalNotificationManager {
     protected void createActionIntents(RichLocalNotification richLocalNotification, NotificationCompat.Builder mBuilder) {
         // Open intent
         Intent intent = buildOpenIntent(richLocalNotification, getOpenAction());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        int openIntentFlags = PendingIntent.FLAG_CANCEL_CURRENT;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            openIntentFlags = openIntentFlags | PendingIntent.FLAG_MUTABLE;
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, richLocalNotification.getId(), intent, openIntentFlags);
         mBuilder.setContentIntent(pendingIntent);
 
         // Dismiss intent
         Intent dissmissIntent = buildDismissIntent(richLocalNotification);
+        int dismissIntentFlags = 0;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            dismissIntentFlags = PendingIntent.FLAG_MUTABLE;
+        }
         PendingIntent deleteIntent = PendingIntent.getBroadcast(
-                context, richLocalNotification.getId(), dissmissIntent, 0);
+                context, richLocalNotification.getId(), dissmissIntent, dismissIntentFlags);
         mBuilder.setDeleteIntent(deleteIntent);
     }
 
