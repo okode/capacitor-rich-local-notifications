@@ -1,6 +1,6 @@
 {
   "name": "capacitor-rich-local-notifications",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Plugin to present rich local notifications",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -43,9 +43,9 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@capacitor/android": "^3.0.0",
-    "@capacitor/core": "^3.0.0",
-    "@capacitor/ios": "^3.0.0",
+    "@capacitor/android": "^4.0.0",
+    "@capacitor/core": "^4.0.0",
+    "@capacitor/ios": "^4.0.0",
     "@ionic/eslint-config": "^0.3.0",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
@@ -58,7 +58,7 @@
     "typescript": "~4.0.3"
   },
   "peerDependencies": {
-    "@capacitor/core": "^3.0.0"
+    "@capacitor/core": "^4.0.0"
   },
   "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
