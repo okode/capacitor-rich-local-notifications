@@ -2,8 +2,11 @@
   <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.okode.richlocalnotifications.capacitorrichlocalnotifications">
     <application>
-      <receiver android:name="com.okode.richlocalnotifications.RichLocalNotificationDismissReceiver" />
-      <receiver android:name="com.okode.richlocalnotifications.TimedNotificationPublisher" />
+      <receiver
+        android:exported="false"
+        android:name="com.okode.richlocalnotifications.RichLocalNotificationDismissReceiver"/>
+      <receiver
+        android:exported="false"
+        android:name="com.okode.richlocalnotifications.TimedNotificationPublisher"/>
     </application>
   </manifest>
-  
