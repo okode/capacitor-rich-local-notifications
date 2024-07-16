@@ -1,6 +1,6 @@
 {
   "name": "capacitor-rich-local-notifications",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Plugin to present rich local notifications",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
